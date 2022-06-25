@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %} 
+
+{% block title %}{% trans "Offer" %} {% endblock %} 
+{% block content %}
+
+
+      <div class="row align-middle">
+        <div class="col-sm-12">
+          <center>
+            <a href="{% url 'showofferlist' %}" role="button" class="btn btn-info btn-large">View All Offers</a>
+            </br> </br>
+          </center>
+        <div class="card">
+          <div class="card-header">
+            <h2>Offer ID : #  {{main_offer_id}}</h2>
+            <h4>Offer Date : {{main_offer.create_date}} </h4>
+            <h4>Offer Price : <b> {{main_offer.Total_Price}}</b> </h4>
+          </div>
+
+        <div class="card-body">
+          <table id="productTable" 
+                 class="table table-bordered table-condensed table-striped">
+            <thead>
+              <tr>
+                <th>.</th>
+                <th>No.of Pax</th>
+                <th>Service</th>
+                <th>Location</th>
+                <th>Price</th>
+                <th>Delete</th>                
+                <th style='display:none;'>SystemID</th>
+              </tr>
+            </thead>
+            {% if offer_lines %}
+            <tbody>
+              {% for offline in offer_lines %}
+              <tr>
+                <td> </td>
+                <td>{{offline.Numbers_of_Pax}} </td>
+                <td> {{offline.Service}} </td>
+                <td>{{offline.Location}}  </td>
+                <td>{{offline.Price}}  </td>
+                <td>
+                  {% if offline.Line_Notes %}
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#infomessage{{offline.Offer_line_id}}">View Information</button>
+                  {% endif %}
+                  <button type='button' onclick='productDelete(this);' class='btn btn-default' data-id='{{offline.line_local_id}} '><span class="fas fa-ban" style="color:red"></span></button></td>
+                <td style='display:none;'>{{offline.line_local_id}}  </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+
+            {% endif %}
+          </table>
+
+        </div>
+
+        </div>
+        </div>
+      </div>
+
+  
+      <div class="row">
+        <div class="col-sm-12 h-100 d-flex justify-content-center align-items-center" >
+        <div class="col-sm-6">
+          <div class="panel panel-primary align-items-center">
+            <div class="panel-heading">
+              Service Information
+            </div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label for="productname">
+                    Numbers of Pax
+                </label>
+                <input type="text"
+                       class="form-control"
+                       value="{{ main_offer_pax }}"
+                       id="productname" onchange="getprice()"/>
+              </div>
+              <div class="form-group">
+                <label for="introdate">
+                    Service
+                </label>
+   
+                <select class="form-select" id="introdate" onchange="getprice()">
+                  <option>---</option>
+                  {% for Serv in main_Services %}
+                  <option value="{{ Serv.id }}">{{ Serv.Service_name }}</option>
+                  {% endfor %}
+
+                </select>                            
+              </div>
+              <div class="form-group">
+                <label for="text">
+                    Location
+                </label>
+
+                <select class="form-select" id="url" onchange="getprice()">
+
+                  {% for Place in main_Places %}
+                  <option value="{{ Place.id }}" >{{ Place.Place_name }}</option>
+                  {% endfor %}
+                </select>                       
+              </div>
+              <div class="form-group">
+                <label for="text">
+                    Price
+                </label>
+                <input type="text"
+                       class="form-control"
+                       value="-1"
+                       id="price" readonly />
+              </div>  
+ 
+              <div class="form-group" style='display:none;'>
+                <label for="text">
+                    SystemID
+                </label>
+                <input type="text"
+                       class="form-control"
+                       value=""
+                       id="SystemID" />
+              </div>  
+
+            </div>
+            
+            <div class="panel-footer">
+              <div class="row">
+                <div class="col-xs-12">
+                </br>
+                  <button type="button" id="updateButton"
+                          class="btn btn-primary"
+                          onclick="productUpdate();">
+                    Add
+                  </button>
+                </br></br>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+{% for offline in offer_lines %}
+<div class="modal fade" id="infomessage{{offline.Offer_line_id}}" tabindex="-1" aria-hidden="true" style="display: none;">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">Information</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body text-start">
+
+      {{offline.Line_Notes|safe}}
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
+ </div>
+ {% endfor %}
+
+    {% endblock %} 
+
+    {% block script %}
+    <script>
+      // Next id for adding a new Product
+      var nextId = 1;
+      // ID of Product currently editing
+      var activeId = 0;
+  
+      function productDisplay(ctl) {
+        var row = $(ctl).parents("tr");
+        var cols = row.children("td");
+  
+        activeId = $($(cols[0]).children("button")[0]).data("id");
+        $("#productname").val($(cols[1]).text());
+        $("#introdate").val($(cols[2]).text());
+        $("#url").val($(cols[3]).text());
+  
+        // Change Update Button Text
+        $("#updateButton").text("Update");
+      }
+  
+      function productUpdate() {
+        if ($("#updateButton").text() == "Update") {
+          productUpdateInTable(activeId);
+        }
+        else {
+          productAddToTable();
+        }
+  
+        // Clear form fields
+        formClear();
+  
+        // Focus to product name field
+        $("#productname").focus();
+      }
+  
+      // Add product to <table>
+      function productAddToTable() {
+
+        // First check if a <tbody> tag exists, add one if not
+        if ($("#productTable tbody").length == 0) {
+          $("#productTable").append("<tbody></tbody>");
+        }
+  
+        // Append product to table
+        $("#productTable tbody").append(
+          productBuildTableRow(nextId));
+  
+        // Increment next ID to use
+        nextId += 1;
+      }
+  
+      // Update product in <table>
+      function productUpdateInTable(id) {
+        // Find Product in <table>
+        var row = $("#productTable button[data-id='" + id + "']")
+                  .parents("tr")[0];
+  
+        // Add changed product to table
+        $(row).after(productBuildTableRow(id));
+        // Remove original product
+        $(row).remove();
+  
+        // Clear form fields
+        formClear();
+  
+        // Change Update Button Text
+        $("#updateButton").text("Add");
+      }
+  
+      // Build a <table> row of Product data
+      function productBuildTableRow(id) {
+        if ($("#price").val()>-1){
+
+          pax = $("#productname").val();
+          service = $("#introdate").val();
+          place = $("#url").val();
+          price = $("#price").val();
+          $.ajax({url: "{% url 'ajxsaveofferline' %}?pax=" + pax + "&offer_id="  + {{main_offer_id}} + "&service="  + service + "&place="  + place + "&price="  + price, success: function(result){
+              //$("#SystemID").val(result);
+              //sys_local_id=result;
+              //$("#SystemID").val(result);
+              //alert(sys_local_id);
+              location.reload();
+            }});  
+            var ret =
+            "<tr>" +
+              "<td>" +
+                "<button  disabled type='button' " +
+                        "onclick='productDisplay(this);' " +
+                        "class='btn btn-default' " +
+                        "data-id='" + id + "'>" +
+                        "<span class='glyphicon glyphicon-edit' />" +
+                "</button>" +
+              "</td>" +
+              "<td>" + $("#productname").val() + "</td>" +
+              "<td>" + $("#introdate option:selected").text() + "</td>" +
+              "<td>" + $("#url option:selected").text() + "</td>" +
+              "<td>" + $("#price").val() + "</td>" +                
+              "<td>" +
+                "<button type='button' " +
+                        "onclick='productDelete(this);' " +
+                        "class='btn btn-default' " +
+                        "data-id='" + $("#SystemID").val() + "'>" +
+                        "<span class='glyphicon glyphicon-remove' />" +
+                "</button>" +
+                "<td >" + $("#SystemID").val() + "</td>" +                        
+                "</td>" +
+            "</tr>"
+      
+            //return ret;
+           
+          }else{
+            alert ("We can't add new line, No Price for this service!")
+          }
+      }
+  
+      // Delete product from <table>
+      function productDelete(ctl) {
+        //alert ($(ctl).attr("data-id"))
+        $.ajax({url: "{% url 'ajxdelofferline' %}?offer_id="  + {{main_offer_id}}  + "&offer_line_local_id=" + $(ctl).attr("data-id") , success: function(result){
+
+          location.reload();
+        }});         
+        $(ctl).parents("tr").remove();
+      }
+  
+      // Clear form fields
+      function formClear() {
+        $("#productname").val("{{ main_offer_pax }}");
+        $("#introdate").val("");
+        $("#url").val("");
+        $("#price").val("-1");
+      }
+
+      function getprice (){
+        $("#price").val("-1");
+        pax = $("#productname").val();
+        service = $("#introdate").val();
+        place = $("#url").val();
+        //alert(service);
+        $.ajax({url: "{% url 'getserviceprice' %}?pax=" + pax + "&service="  + service + "&place="  + place, success: function(result){
+        $("#price").val(result);
+
+         }});
+   
+      }
+    </script>
+{% endblock %} 
+

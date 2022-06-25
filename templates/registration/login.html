@@ -1,0 +1,44 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block sidebar_navigation %}
+
+{% endblock %}
+{% block navbar_navigation %}
+
+{% endblock %}
+{% block content %}
+	<div class="container features">
+		<div class="row" >
+      <div class="col-lg-12 col-md-4 col-sm-12">
+	  </br></br></br>
+        <form method="post">
+          {% csrf_token %}
+
+<p><label for="id_username">{% trans "Email" %}</label> <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username"></p>
+<p><label for="id_password">{% trans "Password" %}:</label> <input type="password" name="password" autocomplete="current-password" required id="id_password"></p>
+
+
+{% if redirect_field_value == None %}
+<input type="hidden" name="next" value="{% url 'showofferlist' %}">
+{% else %}
+<input type="hidden" name="next" value="{{next}}">
+{% endif %}
+		
+          <button type="submit" class="btn btn-primary">{% trans "Log In" %}</button>
+        </form>
+		</br>
+		<p>{% trans "Forget your password?" %}<a href="{% url 'password_reset' %}">&nbsp;{% trans "Reset Password" %}</a></p>
+
+		</a></p>
+      </div>
+    </div>
+    </div>
+<script type="text/javascript">
+document.getElementById("id_username").classList.add("form-control");
+document.getElementById("id_username").classList.add("col-4");
+document.getElementById("id_password").classList.add("form-control");
+document.getElementById("id_password").classList.add("col-4");
+</script>   	
+{% endblock %}

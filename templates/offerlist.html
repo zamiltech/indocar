@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %} 
+
+{% block title %}{% trans "Offer" %} {% endblock %} 
+{% block content %}
+
+<div class="row">
+
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <center>
+            </br>
+                <a href="{% url 'newoffer' %}" role="button" class="btn btn-info btn-large">New Offer</a>
+                </br> </br>
+              </center>            
+            <div class="card-header">Offer List</div>
+            <div class="card-body">
+                <p class="card-title"></p>
+                <table class="table table-hover" id="dataTables-example" width="100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Company</th>
+                            <th>User</th>
+                            <th>Total Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for offer in main_offer %}
+                        <tr>
+                            <td>{{ offer.Offer_id }}</td>
+                            <td>{{ offer.create_date }}</td>
+                            <td>{{ offer.Company_name }}</td>
+                            <td>{{ offer.Offer_user }}</td>
+                            <td>{{ offer.Total_Price }}</td>
+                            <td>
+                                <!-- <button type="button" class="btn btn-info">View Offer</button> -->
+                                <a href="{% url 'edit-offer' offer.local_id %}" role="button" class="btn btn-success btn-large">View Offer</a>
+                                <button type='button' onclick='productDelete(this);' class='btn btn-default' ><span class="fas fa-ban" style="color:red"></span></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %} 
+{% block script %}
+<script>
+// Initiate datatables in roles, tables, users page
+(function() {
+    'use strict';
+    
+    $('#dataTables-example').DataTable({
+        responsive: true,
+        pageLength: 5,
+        lengthChange: false,
+        searching: true,
+        ordering: true
+    });
+})();
+</script>
+{% endblock %} 

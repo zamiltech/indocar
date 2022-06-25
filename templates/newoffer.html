@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %} 
+
+{% block title %}{% trans "Offer" %} {% endblock %} 
+
+
+{% block content %}
+
+    <h2>New Offer</h2>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-secondary">Save</button>
+    </form>
+   
+{% endblock %}

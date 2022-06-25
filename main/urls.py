@@ -12,6 +12,7 @@ urlpatterns = [
     path('getserviceprice', views.getserviceprice, name='getserviceprice'),
     path('ajxsaveofferline', views.addnewofferline, name='ajxsaveofferline'),
     path('ajxdelofferline', views.deletewofferline, name='ajxdelofferline'),
+    path('ajxcloseoffer', views.closeoffer, name='ajxcloseoffer'),
     path('offer/list', views.showofferlist, name='showofferlist'),
     path('', views.showofferlist, name='showofferlist'),
     path('offer/new', views.newoffer, name='newoffer'),

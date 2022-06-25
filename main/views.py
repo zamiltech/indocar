@@ -45,7 +45,15 @@ def editoffer(request,offer_id):
 @login_required(login_url='login')
 def showofferlist(request):
 
-    main_offer = Offer.objects.all()
+    
+    # show his offers only
+    main_offer = Offer.objects.filter(Offer_user=request.user)
+    if request.user.groups.filter(name='offer_company_admin').exists():
+        main_offer = Offer.objects.filter(Company_name__in= Company.objects.filter(users=request.user))
+
+    if request.user.groups.filter(name='offer_super_admin').exists():
+        main_offer = Offer.objects.all()
+    
     main_Services = Services.objects.all()
     main_Places = Places.objects.all()
 
@@ -73,7 +81,7 @@ def getserviceprice(request):
     except :
         return HttpResponse("-1")   
 
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def updateoffercost(offerid):
     main_offer = Offer.objects.get(Offer_id=offerid)
     x_price= 0
@@ -86,10 +94,19 @@ def updateoffercost(offerid):
 def deletewofferline(request):
     main_main_offer = request.GET.get('offer_id')
     local_offer_line_id = request.GET.get('offer_line_local_id')
-    print (local_offer_line_id)
+    #print (local_offer_line_id)
     _line_offer = Offer_line.objects.filter(line_local_id=local_offer_line_id).get()
     _line_offer.delete()
     updateoffercost(main_main_offer) 
+
+    return HttpResponse("Ok")
+
+def closeoffer(request):
+    main_local_offer = request.GET.get('offer_local_id')
+    _offer = Offer.objects.filter(local_id=main_local_offer).get()
+    _offer.is_closed = True
+    _offer.save()
+    updateoffercost(_offer.Offer_id) 
 
     return HttpResponse("Ok")
 

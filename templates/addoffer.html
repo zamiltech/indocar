@@ -17,6 +17,13 @@
             <h2>Offer ID : #  {{main_offer_id}}</h2>
             <h4>Offer Date : {{main_offer.create_date}} </h4>
             <h4>Offer Price : <b> {{main_offer.Total_Price}}</b> </h4>
+            {% if not main_offer.is_closed  %}
+            <button type="button" class="btn btn-warning" onclick='closeoffer();' >Close Offer</button>
+            {% else %}
+
+            <p class="float-end text-danger">Offer Closed!</p>  
+
+            {% endif%}
           </div>
 
         <div class="card-body">
@@ -46,7 +53,9 @@
                   {% if offline.Line_Notes %}
                   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#infomessage{{offline.Offer_line_id}}">View Information</button>
                   {% endif %}
+                  {% if not main_offer.is_closed  %}
                   <button type='button' onclick='productDelete(this);' class='btn btn-default' data-id='{{offline.line_local_id}} '><span class="fas fa-ban" style="color:red"></span></button></td>
+                  {% endif %}
                 <td style='display:none;'>{{offline.line_local_id}}  </td>
               </tr>
 
@@ -62,7 +71,7 @@
         </div>
       </div>
 
-  
+    {% if not main_offer.is_closed  %}
       <div class="row">
         <div class="col-sm-12 h-100 d-flex justify-content-center align-items-center" >
         <div class="col-sm-6">
@@ -145,7 +154,7 @@
 
       </div>
     </div>
-
+  {% endif%}
 
 {% for offline in offer_lines %}
 <div class="modal fade" id="infomessage{{offline.Offer_line_id}}" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -172,6 +181,13 @@
 
     {% block script %}
     <script>
+      function closeoffer() {
+        //alert("d");
+        $.ajax({url: "{% url 'ajxcloseoffer' %}?offer_local_id={{main_offer.local_id}}"  , success: function(result){
+          location.reload();
+        }});
+        location.reload();  
+      }
       // Next id for adding a new Product
       var nextId = 1;
       // ID of Product currently editing
@@ -253,7 +269,8 @@
               //$("#SystemID").val(result);
               //alert(sys_local_id);
               location.reload();
-            }});  
+            }});
+            location.reload();  
             var ret =
             "<tr>" +
               "<td>" +

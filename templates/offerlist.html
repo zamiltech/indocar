@@ -39,7 +39,15 @@
                             <td>
                                 <!-- <button type="button" class="btn btn-info">View Offer</button> -->
                                 <a href="{% url 'edit-offer' offer.local_id %}" role="button" class="btn btn-success btn-large">View Offer</a>
+                                {% if not offer.is_closed  %}
                                 <button type='button' onclick='productDelete(this);' class='btn btn-default' ><span class="fas fa-ban" style="color:red"></span></button>
+                                {% else %}
+                                
+                                <!-- <p class="text-danger">Offer Closed!</p> 
+                                <span style="color:red">Offer Closed!</span>
+                                -->
+                    
+                                {% endif%}                                
                             </td>
                         </tr>
                     {% endfor %}
@@ -59,7 +67,7 @@
     
     $('#dataTables-example').DataTable({
         responsive: true,
-        pageLength: 5,
+        pageLength: 15,
         lengthChange: false,
         searching: true,
         ordering: true

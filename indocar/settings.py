@@ -131,12 +131,18 @@ STATIC_URL = '/static/'
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-if DEBUG:
-    STATICFILES_DIRS = [
-        os.path.join(SITE_ROOT, 'static/')
-    ]
-else:
-    STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
+#if DEBUG:
+#    STATICFILES_DIRS = [
+#        os.path.join(SITE_ROOT, 'static/')
+#    ]
+#else:
+#    STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-@*f9wx!b!qs5&gc&yii^%xb*wx%b#zp#afpa7im+c1b7m*ab6^'
 
 # SECURITY WARNING: don't run with debug turned on in production! True 
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['markazasia.com','127.0.0.1','localhost','164.92.155.247']
+ALLOWED_HOSTS = ['www.markazasia.com','markazasia.com','127.0.0.1','localhost','164.92.155.247']
 
 
 # Application definition
@@ -76,8 +76,8 @@ WSGI_APPLICATION = 'indocar.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-   # 'default': {
-   #     'ENGINE': 'django.db.backends.sqlite3',
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
    #     'NAME': BASE_DIR / 'db.sqlite3',
    # }
     'default': {   
@@ -129,15 +129,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+#SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-if DEBUG:
-    STATICFILES_DIRS = [
-        os.path.join(SITE_ROOT, 'static/')
-    ]
-else:
-    STATIC_ROOT = os.path.join(SITE_ROOT, 'static/')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
